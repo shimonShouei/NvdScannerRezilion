@@ -12,9 +12,8 @@ def get_sw_lst_key(reg_conn):
     return k
 
 
-def get_sw_lst():
+def get_sw_lst(aReg):
     aKey = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
-    aReg = connect_to_registry(winreg.HKEY_LOCAL_MACHINE)
     print(r"*** Reading from %s ***" % aKey)
     aKey = winreg.OpenKey(aReg, aKey)
     requested_data_field = "DisplayName"  # choose here which field you need
@@ -31,4 +30,9 @@ def get_sw_lst():
         except EnvironmentError:
             print(r"*** %s files was found ***" % i)
             break
-        return sw_lst
+    return sw_lst
+
+
+if __name__ == "__main__":
+    aR = connect_to_registry(winreg.HKEY_LOCAL_MACHINE)
+    l = get_sw_lst(aR)
