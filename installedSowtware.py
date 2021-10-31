@@ -1,6 +1,7 @@
 import winreg
 from winreg import QueryValueEx, EnumKey
 
+key_dict = {winreg.HKEY_LOCAL_MACHINE: 'HKEY_LOCAL_MACHINE', winreg.HKEY_CURRENT_USER: 'HKEY_CURRENT_USER'}
 
 def connect_to_registry(key):
     reg = winreg.ConnectRegistry(None, key)
@@ -12,9 +13,10 @@ def get_sw_lst_key(reg_conn):
     return k
 
 
-def get_sw_lst(aReg):
+def get_sw_lst(aRegHK):
     aKey = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
-    print(r"*** Reading from %s ***" % aKey)
+    aReg = connect_to_registry(aRegHK)
+    print(r"*** Reading from %s %s ***" % (key_dict[aRegHK], aKey))
     aKey = winreg.OpenKey(aReg, aKey)
     requested_data_field = "DisplayName"  # choose here which field you need
     sw_lst = []
@@ -34,5 +36,7 @@ def get_sw_lst(aReg):
 
 
 if __name__ == "__main__":
-    aR = connect_to_registry(winreg.HKEY_LOCAL_MACHINE)
-    l = get_sw_lst(aR)
+    aRHK = winreg.HKEY_LOCAL_MACHINE
+    l_lm = get_sw_lst(aRHK)
+    aRHK = winreg.HKEY_CURRENT_USER
+    l_cu = get_sw_lst(aRHK)
