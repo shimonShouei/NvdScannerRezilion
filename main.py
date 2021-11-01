@@ -10,7 +10,7 @@ def main():
     cve_year_collection = CVEsCollection(year)
     cve_dict = cve_year_collection.getCVE_Items()
     cve_year_collection.getCveByIndex(0)
-    print()
+    print("Hello")
 
 
 
