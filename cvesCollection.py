@@ -1,6 +1,6 @@
 import utils
 import json
-
+from cve import Cve
 
 class CVEsCollection:
 
@@ -41,3 +41,15 @@ class CVEsCollection:
         :return: CVE Items
         """
         return self.CVE_Items
+
+    def getCveByIndex(self, index : int):
+        """
+
+        :param index:
+        :return:
+        """
+        dict = self.CVE_Items[index]
+        cve = Cve(dict)
+
+        return cve
+
