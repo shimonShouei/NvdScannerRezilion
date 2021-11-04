@@ -36,5 +36,5 @@ def get_sw_lst(aRegHK):
 
 
 if __name__ == "__main__":
-    l_lm = get_sw_lst(winreg.HKEY_LOCAL_MACHINE)
-    l_cu = get_sw_lst(winreg.HKEY_CURRENT_USER)
+    LocalMachList = get_sw_lst(winreg.HKEY_LOCAL_MACHINE)
+    CurUserList = get_sw_lst(winreg.HKEY_CURRENT_USER)
