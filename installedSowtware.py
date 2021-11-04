@@ -36,7 +36,5 @@ def get_sw_lst(aRegHK):
 
 
 if __name__ == "__main__":
-    aRHK = winreg.HKEY_LOCAL_MACHINE
-    l_lm = get_sw_lst(aRHK)
-    aRHK = winreg.HKEY_CURRENT_USER
-    l_cu = get_sw_lst(aRHK)
+    l_lm = get_sw_lst(winreg.HKEY_LOCAL_MACHINE)
+    l_cu = get_sw_lst(winreg.HKEY_CURRENT_USER)
