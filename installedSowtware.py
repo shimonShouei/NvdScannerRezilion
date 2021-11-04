@@ -7,13 +7,7 @@ def connect_to_registry(key):
     reg = winreg.ConnectRegistry(None, key)
     return reg
 
-
-def get_sw_lst_key(reg_conn):
-    k = winreg.OpenKeyEx(reg_conn, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
-    return k
-
-
-def get_sw_lst(MainKey):
+def get_software_lst(MainKey):
     aKey = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
     aReg = connect_to_registry(MainKey)
     print(r"*** Reading from %s %s ***" % (key_dict[MainKey], aKey))
@@ -26,7 +20,7 @@ def get_sw_lst(MainKey):
             asubkey = winreg.OpenKey(aKey, asubkey_name)
             val = QueryValueEx(asubkey, requested_data_field)
             sw_lst.append(val)
-            print(val)
+            print(val[0])
         except FileNotFoundError:
             continue
         except EnvironmentError:
@@ -36,5 +30,5 @@ def get_sw_lst(MainKey):
 
 
 if __name__ == "__main__":
-    LocalMachList = get_sw_lst(winreg.HKEY_LOCAL_MACHINE)
-    CurUserList = get_sw_lst(winreg.HKEY_CURRENT_USER)
+    LocalMachList = get_software_lst(winreg.HKEY_LOCAL_MACHINE)
+    CurUserList = get_software_lst(winreg.HKEY_CURRENT_USER)
