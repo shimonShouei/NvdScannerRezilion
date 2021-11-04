@@ -13,10 +13,10 @@ def get_sw_lst_key(reg_conn):
     return k
 
 
-def get_sw_lst(aRegHK):
+def get_sw_lst(MainKey):
     aKey = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
-    aReg = connect_to_registry(aRegHK)
-    print(r"*** Reading from %s %s ***" % (key_dict[aRegHK], aKey))
+    aReg = connect_to_registry(MainKey)
+    print(r"*** Reading from %s %s ***" % (key_dict[MainKey], aKey))
     aKey = winreg.OpenKey(aReg, aKey)
     requested_data_field = "DisplayName"  # choose here which field you need
     sw_lst = []
