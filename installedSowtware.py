@@ -7,7 +7,13 @@ def connect_to_registry(key):
     reg = winreg.ConnectRegistry(None, key)
     return reg
 
-def get_software_lst(MainKey):
+
+def get_sw_lst_key(reg_conn):
+    k = winreg.OpenKeyEx(reg_conn, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
+    return k
+
+
+def get_sw_lst(aRegHK):
     aKey = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
     aReg = connect_to_registry(MainKey)
     print(r"*** Reading from %s %s ***" % (key_dict[MainKey], aKey))
