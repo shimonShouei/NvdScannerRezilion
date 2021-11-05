@@ -3,9 +3,11 @@ from winreg import QueryValueEx, EnumKey
 
 key_dict = {winreg.HKEY_LOCAL_MACHINE: 'HKEY_LOCAL_MACHINE', winreg.HKEY_CURRENT_USER: 'HKEY_CURRENT_USER'}
 
+
 def connect_to_registry(key):
     reg = winreg.ConnectRegistry(None, key)
     return reg
+
 
 def get_software_lst(MainKey):
     aKey = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
