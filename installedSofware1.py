@@ -7,19 +7,19 @@ dir_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
 
 def print_lists(lst):
     for k, elm in enumerate(lst):
-        print("{}: {}".format(k, elm))
+        print("{}: {}".format(k, elm[0]))
 
 
 class RegistryConnection:
     def __init__(self):
         self.registry_cursor = ''
 
-    def connect_to_registry(self, key):
+    def connect_to_mainKey(self, key):
         self.registry_cursor = winreg.ConnectRegistry(None, key)
 
-    def open_reg_element_by_key(self, connection_cursor, key):
+    def open_subKey(self, mainKey, subKey):
         try:
-            return winreg.OpenKey(connection_cursor, key)
+            return winreg.OpenKey(mainKey, subKey)
         except EnvironmentError:
             print("***cursor is empty ***")
 
@@ -35,12 +35,12 @@ if __name__ == "__main__":
     reg_conn = RegistryConnection()
     for hkey in hkey_dict:
         software_lst = []
-        reg_conn.connect_to_registry(hkey) # establish connection to registry
-        dir_conn = reg_conn.open_reg_element_by_key(reg_conn.registry_cursor, dir_path) # establish connection to registry dir
+        reg_conn.connect_to_mainKey(hkey)  # establish connection to registry
+        dir_conn = reg_conn.open_subKey(reg_conn.registry_cursor, dir_path)  # establish connection to registry dir
         for i in range(1024):
             try:
                 software_key = reg_conn.get_software_enum_key(dir_conn, i)
-                software_conn = reg_conn.open_reg_element_by_key(dir_conn, software_key) # establish connection to software file
+                software_conn = reg_conn.open_subKey(dir_conn, software_key)  # establish connection to software file
                 val = reg_conn.get_software_data_by_field(software_conn, requested_data_field)
                 software_lst.append(val)
             except FileNotFoundError:
