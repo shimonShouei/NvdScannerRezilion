@@ -1,5 +1,6 @@
 import utils
 from cvesCollection import CVEsCollection
+from cve import Cve
 
 def main():
     """
@@ -8,9 +9,10 @@ def main():
     """
     year = "2021"
     cve_year_collection = CVEsCollection(year)
-    cve_dict = cve_year_collection.getCVE_Items()
-    cve_year_collection.getCveByIndex(0)
+    cve = cve_year_collection.getCveByIndex(51)
     print("Hello")
+
+
 
 
 
