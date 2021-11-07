@@ -7,7 +7,7 @@ dir_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
 
 def print_lists(lst):
     for k, elm in enumerate(lst):
-        print("{}: {}".format(k, elm[0]))
+        print("{}: {}".format(k+1, elm[0]))
 
 
 class RegistryConnection:
