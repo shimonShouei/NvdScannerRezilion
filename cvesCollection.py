@@ -45,7 +45,7 @@ class CVEsCollection:
     def getCveByIndex(self, index : int):
         """
 
-        :param index:
+        :param index: the index indicates the location of the cve within the list of cve collection
         :return:
         """
         dict = self.CVE_Items[index]
