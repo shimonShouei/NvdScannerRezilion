@@ -1,10 +1,6 @@
 import winreg
 from winreg import QueryValueEx, EnumKey
 
-hkey_dict = {winreg.HKEY_LOCAL_MACHINE: 'HKEY_LOCAL_MACHINE', winreg.HKEY_CURRENT_USER: 'HKEY_CURRENT_USER'}
-dir_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
-
-
 def print_lists(lst):
     for k, elm in enumerate(lst):
         print("{}: {}".format(k+1, elm[0]))
@@ -12,9 +8,11 @@ def print_lists(lst):
 
 class RegistryConnection:
     def __init__(self):
-        self.registry_cursor = ''
+        self.registry_cursor = None
+        self.dir_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+        self.hkey_dict = {winreg.HKEY_LOCAL_MACHINE: 'HKEY_LOCAL_MACHINE', winreg.HKEY_CURRENT_USER: 'HKEY_CURRENT_USER'}
 
-    def connect_to_mainKey(self, key):
+    def connect_to_main_key(self, key):
         self.registry_cursor = winreg.ConnectRegistry(None, key)
 
     def open_element_by_key(self, mainKey, key):
@@ -33,10 +31,10 @@ class RegistryConnection:
 if __name__ == "__main__":
     requested_data_field = "DisplayName"  # choose here which field you need
     reg_conn = RegistryConnection()
-    for hkey in hkey_dict:
+    for hkey in reg_conn.hkey_dict:
         software_lst = []
-        reg_conn.connect_to_mainKey(hkey)  # establish connection to registry
-        dir_conn = reg_conn.open_element_by_key(reg_conn.registry_cursor, dir_path)  # establish connection to registry dir
+        reg_conn.connect_to_main_key(hkey)  # establish connection to registry
+        dir_conn = reg_conn.open_element_by_key(reg_conn.registry_cursor, reg_conn.dir_path)  # establish connection to registry dir
         for i in range(1024):
             try:
                 software_key = reg_conn.get_software_enum_key(dir_conn, i)
@@ -46,6 +44,6 @@ if __name__ == "__main__":
             except FileNotFoundError:
                 continue
             except EnvironmentError:
-                print(r"*** %s files was found in %s ***" % (i, hkey_dict[hkey]))
+                print(r"*** %s files was found in %s ***" % (i, reg_conn.hkey_dict[hkey]))
                 print_lists(software_lst)
                 break
