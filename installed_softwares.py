@@ -3,11 +3,6 @@ from winreg import QueryValueEx, EnumKey
 import logging
 
 
-def print_lists(lst):
-    for k, elm in enumerate(lst):
-        logging.info("{}: {}".format(k + 1, elm[0]))
-
-
 class RegistryConnection:
     def __init__(self):
         self.registry_cursor = None
@@ -31,29 +26,42 @@ class RegistryConnection:
         return EnumKey(directory_conn, software_index)
 
 
-if __name__ == "__main__":
-    log_name = 'log_file'
-    logging.basicConfig(filename=log_name,
-                        filemode='a',
-                        format='%(asctime)s %(message)s',
-                        level=logging.INFO)
-    requested_data_field = "DisplayName"  # choose here which field you need
-    reg_conn = RegistryConnection()
-    software_lst = []
-    for hkey in reg_conn.hkey_dict:
-        reg_conn.connect_to_main_key(hkey)  # establish connection to registry
-        dir_conn = reg_conn.open_element_by_key(reg_conn.registry_cursor,
-                                                reg_conn.dir_path)  # establish connection to registry dir
-        for i in range(1024):
-            try:
-                software_key = reg_conn.get_software_enum_key(dir_conn, i)
-                software_conn = reg_conn.open_element_by_key(dir_conn,
-                                                             software_key)  # establish connection to software file
-                val = reg_conn.get_software_data_by_field(software_conn, requested_data_field)
-                software_lst.append(val)
-            except FileNotFoundError:
-                continue
-            except EnvironmentError:
-                logging.info(r"*** %s files was found in %s ***" % (i, reg_conn.hkey_dict[hkey]))
-                break
-    print_lists(software_lst)
+class InstalledSoftware:
+    def __init__(self):
+        self.reg_conn = RegistryConnection()
+        self.requested_data_field = "DisplayName"  # choose here which field you need
+        self.log_configures()
+
+    def get_installed_software(self):
+        software_lst = []
+        for hkey in self.reg_conn.hkey_dict:
+            self.reg_conn.connect_to_main_key(hkey)  # establish connection to registry
+            dir_conn = self.reg_conn.open_element_by_key(self.reg_conn.registry_cursor,
+                                                         self.reg_conn.dir_path)  # establish connection to registry dir
+            for i in range(1024):
+                try:
+                    software_key = self.reg_conn.get_software_enum_key(dir_conn, i)
+                    software_conn = self.reg_conn.open_element_by_key(dir_conn,
+                                                                      software_key)  # establish connection to software file
+                    val = self.reg_conn.get_software_data_by_field(software_conn, self.requested_data_field)
+                    software_lst.append(val)
+                except FileNotFoundError:
+                    continue
+                except EnvironmentError:
+                    logging.info(r"*** %s files was found in %s ***" % (i, self.reg_conn.hkey_dict[hkey]))
+                    break
+        self.log_lists(software_lst)
+
+    def log_configures(self):
+        log_name = 'log_file.log'
+        logging.basicConfig(filename=log_name,
+                            filemode='a',
+                            format='%(asctime)s %(message)s',
+                            level=logging.INFO)
+
+    def log_lists(self, lst):
+        for k, elm in enumerate(lst):
+            logging.info("{}: {}".format(k + 1, elm[0]))
+
+
+
