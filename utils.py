@@ -4,7 +4,6 @@ from os import listdir
 from os.path import isfile, join
 import zipfile
 import json
-import pathlib
 
 
 def downloadAllZipsFiles():
@@ -28,10 +27,6 @@ def getCVE_Dict(year: str) -> {}:
     :return: CVE dictionary
     """
     cve_dict = {}
-    if 'nvd' not in listdir():
-        pathlib.Path('nvd').mkdir(parents=True, exist_ok=True)
-        downloadAllZipsFiles()
-
     files = [f for f in listdir("nvd/") if isfile(join("nvd/", f))]
     files.sort()
     for file in files:
@@ -41,3 +36,12 @@ def getCVE_Dict(year: str) -> {}:
             cve_dict = json.loads(jsonfile.read())
             jsonfile.close()
     return cve_dict
+
+
+def downloadAllZipFiles(SourceUrl, FileName):
+    r = requests.get(SourceUrl)
+    for filename in re.findall(FileName, r.text):
+        r_file = requests.get("https://nvd.nist.gov/feeds/json/cve/1.1/" + filename, stream=True)
+        with open("nvd/" + filename, 'wb') as f:
+            for chunk in r_file:
+                f.write(chunk)
