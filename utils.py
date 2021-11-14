@@ -4,6 +4,7 @@ from os import listdir
 from os.path import isfile, join
 import zipfile
 import json
+import pathlib
 
 
 def downloadAllZipsFiles():
@@ -27,6 +28,10 @@ def getCVE_Dict(year: str) -> {}:
     :return: CVE dictionary
     """
     cve_dict = {}
+    if 'nvd' not in listdir():
+        pathlib.Path('nvd').mkdir(parents=True, exist_ok=True)
+        downloadAllZipsFiles()
+
     files = [f for f in listdir("nvd/") if isfile(join("nvd/", f))]
     files.sort()
     for file in files:
