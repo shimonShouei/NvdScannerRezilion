@@ -1,19 +1,15 @@
-import utils
-from cvesCollection import CVEsCollection
+from cve_parser import CveParser
+
 
 def main():
-    """
-
-    :return:
-    """
+    parse = CveParser()
     year = "2021"
-    cve_year_collection = CVEsCollection(year)
-    cve_dict = cve_year_collection.getCVE_Items()
-    cve_year_collection.getCveByIndex(0)
-    print("Hello")
+    cve_specific_year_collection = parse.get_cve_collection_for_specific_year(year)
+    print(cve_specific_year_collection[0].identifier)
+    print(cve_specific_year_collection[0].cve_to_string())
+    parse.write_all_cve_collection_for_specific_year_to_file("2002")
 
 
 
 if __name__ == '__main__':
     main()
-
