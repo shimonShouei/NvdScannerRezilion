@@ -1,50 +1,18 @@
+from dataclasses import dataclass
 
+
+@dataclass
 class Cve:
+    identifier: int
+    assigner: str
+    description: str
+    severity: str
 
-    def __init__(self, dict : {}):
-        """
+    def __init__(self, identifier, assigner, description, severity):
+        self.identifier = identifier
+        self.assigner = assigner
+        self.description = description
+        self.severity = severity
 
-        """
-        self.identifier = dict['cve']['CVE_data_meta']['ID']
-        self.ASSIGNER = dict['cve']['CVE_data_meta']['ASSIGNER']
-        self.description = dict['cve']['problemtype']['problemtype_data'][0]['description'][0]['value']
-        self.severity = dict['impact']
-        if len(self.severity) > 1:
-            self.severity = self.severity['baseMetricV3']['cvssV3']['baseSeverity']
-        else:
-            self.severity = self.severity['baseMetricV2']['severity']
-
-
-
-    def getCveId(self) -> int:
-        """
-
-        :return:
-        """
-        return self.identifier
-
-    def getCveAssigner(self) -> str:
-        """
-
-        :return:
-        """
-        return self.ASSIGNER
-
-    def getCveDescription(self) -> str:
-        """
-
-        :return:
-        """
-        return self.description
-
-    def getCveSeverity(self) -> str:
-        """
-        :return:
-        """
-        return self.severity
-
-    def printCve(self):
-        print("CVE identifier: " + self.identifier)
-        print("CVE Assigner: " + self.ASSIGNER)
-        print("CVE description: " + self.description)
-        print("CVE severity: " + self.severity)
+    def cve_to_string(self) -> str:
+        return """Identifier: {0}\n Assigner: {1}\n Description: {2}\n Severity: {3}""".format(self.identifier, self.assigner, self.description, self.severity)
