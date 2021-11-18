@@ -4,6 +4,7 @@ from os import listdir
 from os.path import isfile, join
 import zipfile
 import json
+import os
 
 
 def downloadAllZipsFiles():
@@ -38,10 +39,14 @@ def getCVE_Dict(year: str) -> {}:
     return cve_dict
 
 
-def downloadAllZipFiles(SourceUrl, FileName):
-    r = requests.get(SourceUrl)
-    for filename in re.findall(FileName, r.text):
-        r_file = requests.get("https://nvd.nist.gov/feeds/json/cve/1.1/" + filename, stream=True)
-        with open("nvd/" + filename, 'wb') as f:
-            for chunk in r_file:
-                f.write(chunk)
+def download_file(source_url, file_name):
+    r_file = requests.get(source_url, stream=True)
+    with open(file_name, 'wb') as f:
+        for chunk in r_file:
+            f.write(chunk)
+
+
+def unzip_file(file_name, extract_to_directory=None):
+    with zipfile.ZipFile(file_name, 'r') as zip_ref:
+        zip_ref.extractall(extract_to_directory)
+    os.remove(file_name)  # removing the .zip file
