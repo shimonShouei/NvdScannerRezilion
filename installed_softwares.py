@@ -63,5 +63,5 @@ class InstalledSoftware:
         for k, elm in enumerate(lst):
             logging.info("{}: {}".format(k + 1, elm[0]))
 
-
-
+# i_s = InstalledSoftware()
+# i_s.get_installed_software()
