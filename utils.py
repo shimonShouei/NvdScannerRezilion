@@ -46,7 +46,7 @@ def download_file(source_url, file_name):
             f.write(chunk)
 
 
-def unzip_file(file_name, extract_to_directory=None):
+def unzip_file(file_name, directory_to_extract = None):
     with zipfile.ZipFile(file_name, 'r') as zip_ref:
-        zip_ref.extractall(extract_to_directory)
+        zip_ref.extractall(directory_to_extract)
     os.remove(file_name)  # removing the .zip file
