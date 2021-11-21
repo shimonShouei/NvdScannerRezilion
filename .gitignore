@@ -13,3 +13,5 @@ nvd/
 /log_file.log
 
 official-cpe-dictionary_v2.3TESTS.xml
+
+*.csv
