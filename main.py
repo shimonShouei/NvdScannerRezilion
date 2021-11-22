@@ -10,7 +10,7 @@ def main():
     # print(cve_specific_year_collection[0].cve_to_string())
     # parse.write_all_cve_collection_for_specific_year_to_file("2002")
 
-    get_files_programfiles.get_file_from_path()
+    get_files_programfiles.get_file_from_path("Common Files")
     # get_files_programfiles.get_file_from_path("C:\Program Files (x86)")
 
 
