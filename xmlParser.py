@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as et
-
+from utils import *
 # import pandas as pd
 
 # namespaces = {'': 'http://cpe.mitre.org/dictionary/2.0',
@@ -23,7 +23,15 @@ import pandas as pd
 cpe_file_name = 'official-cpe-dictionary_v2.3TESTS.xml'
 
 
-class CpeXml:
+class CpePdDataAccess:
+    def __init__(self, file_name):
+        self.data = pd.read_csv(file_name)
+
+    def find_cpe_by_software(self, publisher, display_version):
+        pass
+
+
+class CpeXmlParser:
     def __init__(self, file_name):
         self.tree = et.parse(file_name)
         self.root = self.tree.getroot()
@@ -70,13 +78,13 @@ class CpeXml:
                 cpeItem.find('{http://scap.nist.gov/schema/cpe-extension/2.3}cpe23-item').attrib.get('name'))
         return cpe_23_names
 
-    def string_to_cpe(self, prog_name):
+    def fit_cpe_to_software(self, prog_name):
         for cpe_item in self.get_all_cpe_items():
             if prog_name in cpe_item.find('title', self.namespaces).text:
                 return cpe_item
 
 
-cpe_xml = CpeXml(cpe_file_name)
+cpe_xml = CpeXmlParser(cpe_file_name)
 titles = cpe_xml.get_all_titles_text()
 cpe_items = cpe_xml.get_all_cpe_items_names()
 cpe_23_names = cpe_xml.get_all_cpe23_names()
