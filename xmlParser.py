@@ -19,16 +19,26 @@ from utils import *
 # x = df[df['product'] == 'form_maker']
 # print(x)
 import pandas as pd
+from installed_softwares import InstalledSoftware
 
-cpe_file_name = 'official-cpe-dictionary_v2.3TESTS.xml'
+cpe_xml_file_name = 'official-cpe-dictionary_v2.3.xml'
+parsed_cpe_csv_file_name = 'parsed_xml.csv'
+reg_data_file_name = 'registry_data.json'
 
 
 class CpePdDataAccess:
-    def __init__(self, file_name):
-        self.data = pd.read_csv(file_name)
+    def __init__(self, cpe_dict_file_name, reg_list_file_name):
+        self.cpe_data = pd.read_csv(cpe_dict_file_name)
+        self.installed_software_getter = InstalledSoftware()
+        self.registry_data = pd.read_json(reg_list_file_name)
 
     def find_cpe_by_software(self, publisher, display_version):
-        pass
+        publisher_split = publisher.split(' ')
+        display_version_split = display_version.split('.')
+        temp1 = self.cpe_data[self.cpe_data.vendor.str.contains(' '.join(publisher_split[:2]).lower() + '|' + publisher_split[0].lower())]
+        # temp2 = temp1[temp1.version.str.contains('|'.join([' '.join(display_version_split[:i]).lower() for i in range(len(display_version_split))]))]
+        return temp1
+        # temp = temp[temp.version.str.contains]
 
 
 class CpeXmlParser:
@@ -66,7 +76,7 @@ class CpeXmlParser:
         for rfs in self.get_all_cpe_items():
             try:
                 references.append([x.attrib for x in
-                                   rfs.find('references', self.namespaces).findall('reference', cpe_xml.namespaces)])
+                                   rfs.find('references', self.namespaces).findall('reference', self.namespaces)])
             except AttributeError:
                 references.append([])
         return references
@@ -84,16 +94,20 @@ class CpeXmlParser:
                 return cpe_item
 
 
-cpe_xml = CpeXmlParser(cpe_file_name)
-titles = cpe_xml.get_all_titles_text()
-cpe_items = cpe_xml.get_all_cpe_items_names()
-cpe_23_names = cpe_xml.get_all_cpe23_names()
-cpe_references = cpe_xml.get_all_references_text()
-finall_df = pd.DataFrame([titles, cpe_items, cpe_23_names, cpe_references]).transpose()
-finall_df.columns = ['titles', 'cpe_items', 'cpe_23_names', 'cpe_references']
-splited = finall_df['cpe_23_names'].str.split(':', n=12, expand=True)
-new_splited_columns = ['cpe', 'cpe_version', 'part', 'vendor', 'product', 'version', 'update', 'edition', 'language',
-                       'sw_edition', 'target_sw', 'target_hw', 'other']
-finall_df[new_splited_columns] = splited
-finall_df = finall_df.drop(['cpe'], axis=1)
-finall_df.to_csv("parsed_xml.csv")
+# cpe_xml = CpeXmlParser(cpe_file_name)
+# titles = cpe_xml.get_all_titles_text()
+# cpe_items = cpe_xml.get_all_cpe_items_names()
+# cpe_23_names = cpe_xml.get_all_cpe23_names()
+# cpe_references = cpe_xml.get_all_references_text()
+# finall_df = pd.DataFrame([titles, cpe_items, cpe_23_names, cpe_references]).transpose()
+# finall_df.columns = ['titles', 'cpe_items', 'cpe_23_names', 'cpe_references']
+# splited = finall_df['cpe_23_names'].str.split(':', n=12, expand=True)
+# new_splited_columns = ['cpe', 'cpe_version', 'part', 'vendor', 'product', 'version', 'update', 'edition', 'language',
+#                        'sw_edition', 'target_sw', 'target_hw', 'other']
+# finall_df[new_splited_columns] = splited
+# finall_df = finall_df.drop(['cpe'], axis=1)
+# finall_df.to_csv("parsed_xml.csv")
+
+data_access = CpePdDataAccess(parsed_cpe_csv_file_name, reg_data_file_name)
+res = data_access.find_cpe_by_software("Microsoft Corporation", "3.9.5150.0")
+print(res)
