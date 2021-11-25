@@ -15,3 +15,5 @@ nvd/
 official-cpe-dictionary_v2.3TESTS.xml
 
 *.csv
+
+*.json

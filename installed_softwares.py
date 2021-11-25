@@ -2,6 +2,8 @@ import winreg
 from winreg import QueryValueEx, EnumKey
 import logging
 
+import pandas as pd
+
 
 class RegistryConnection:
     def __init__(self):
@@ -44,13 +46,13 @@ class InstalledSoftware:
                     software_conn = self.reg_conn.open_element_by_key(dir_conn,
                                                                       software_key)  # establish connection to software file
                     val = self.reg_conn.get_software_data_by_field(software_conn, self.requested_data_field)
-                    software_lst.append(val)
+                    software_lst.append(val[0])
                 except FileNotFoundError:
                     continue
                 except EnvironmentError:
                     logging.info(r"*** %s files was found in %s ***" % (i, self.reg_conn.hkey_dict[hkey]))
                     break
-        self.log_lists(software_lst)
+        return software_lst
 
     def log_configures(self):
         log_name = 'log_file.log'
@@ -63,5 +65,17 @@ class InstalledSoftware:
         for k, elm in enumerate(lst):
             logging.info("{}: {}".format(k + 1, elm[0]))
 
-# i_s = InstalledSoftware()
+    def dump_software_lst_to_json(self, requested_fields_lst):
+        final_lst = []
+        for field in requested_fields_lst:
+            self.requested_data_field = field
+            final_lst.append(self.get_installed_software())
+        df = pd.DataFrame(data=final_lst)
+        df = df.rename(index={0: "Publisher", 1: 'DisplayVersion', 2: 'DisplayName'})
+        # df.columns =requested_fields_lst
+        df.to_json("registry_data.json")
+
+
+i_s = InstalledSoftware()
 # i_s.get_installed_software()
+i_s.dump_software_lst_to_json(["Publisher", 'DisplayVersion', 'DisplayName'])
