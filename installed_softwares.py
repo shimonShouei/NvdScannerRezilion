@@ -71,7 +71,7 @@ class InstalledSoftware:
             self.requested_data_field = field
             final_lst.append(self.get_installed_software())
         df = pd.DataFrame(data=final_lst)
-        df = df.rename(index={0: "Publisher", 1: 'DisplayVersion', 2: 'DisplayName'})
+        df = df.rename(index={df.index[i]: requested_fields_lst[i] for i in range(len(requested_fields_lst))})
         # df.columns =requested_fields_lst
         df.to_json("registry_data.json")
 
