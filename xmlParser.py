@@ -83,4 +83,9 @@ cpe_23_names = cpe_xml.get_all_cpe23_names()
 cpe_references = cpe_xml.get_all_references_text()
 finall_df = pd.DataFrame([titles, cpe_items, cpe_23_names, cpe_references]).transpose()
 finall_df.columns = ['titles', 'cpe_items', 'cpe_23_names', 'cpe_references']
+splited = finall_df['cpe_23_names'].str.split(':', n=12, expand=True)
+new_splited_columns = ['cpe', 'cpe_version', 'part', 'vendor', 'product', 'version', 'update', 'edition', 'language',
+                       'sw_edition', 'target_sw', 'target_hw', 'other']
+finall_df[new_splited_columns] = splited
+finall_df = finall_df.drop(['cpe'], axis=1)
 finall_df.to_csv("parsed_xml.csv")
