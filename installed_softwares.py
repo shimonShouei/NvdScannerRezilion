@@ -76,6 +76,7 @@ class InstalledSoftware:
         df.to_json("registry_data.json")
 
 
-# i_s = InstalledSoftware()
-# # i_s.get_installed_software()
-# i_s.dump_software_lst_to_json(["Publisher", 'DisplayVersion', 'DisplayName'])
+if __name__ == "__main__":
+    i_s = InstalledSoftware()
+    # i_s.get_installed_software()
+    i_s.dump_software_lst_to_json(["Publisher", 'DisplayVersion', 'DisplayName'])

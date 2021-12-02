@@ -1,23 +1,7 @@
 import xml.etree.ElementTree as et
 from utils import *
-# import pandas as pd
+from difflib import SequenceMatcher
 
-# namespaces = {'': 'http://cpe.mitre.org/dictionary/2.0',
-#                   'xsi': "http://www.w3.org/2001/XMLSchema-instance",
-#                   'scap-core': "http://scap.nist.gov/schema/scap-core/0.3",
-#                   'cpe-23': "http://scap.nist.gov/schema/cpe-extension/2.3",
-#                   "ns6": "http://scap.nist.gov/schema/scap-core/0.1",
-#                   'meta': "http://scap.nist.gov/schema/cpe-dictionary-metadata/0.2"}
-# df = pd.read_xml('official-cpe-dictionary_v2.3TESTS.xml', xpath='//cpe-23:cpe23-item', namespaces=namespaces)
-# splited = df['name'].str.split(':', n=12, expand=True)
-# new_splited_columns = ['cpe', 'cpe_version', 'part', 'vendor', 'product', 'version', 'update', 'edition', 'language',
-#                        'sw_edition', 'target_sw', 'target_hw', 'other']
-# df[new_splited_columns] = splited
-# df = df.drop(['deprecation', 'cpe'], axis=1)
-# # df.to_csv('official-cpe-dictionary_v2.3.csv')
-#
-# x = df[df['product'] == 'form_maker']
-# print(x)
 import pandas as pd
 from installed_softwares import InstalledSoftware
 
@@ -32,12 +16,18 @@ class CpePdDataAccess:
         self.installed_software_getter = InstalledSoftware()
         self.registry_data = pd.read_json(reg_list_file_name)
 
-    def find_cpe_by_software(self, publisher, display_version):
+    def find_cpe_by_software(self, publisher, display_version, display_name):
         publisher_split = publisher.split(' ')
         display_version_split = display_version.split('.')
         temp1 = self.cpe_data[self.cpe_data.vendor.str.contains(' '.join(publisher_split[:2]).lower() + '|' + publisher_split[0].lower())]
+        res = []
+        for i, row in temp1.iterrows():
+            ratio = SequenceMatcher(display_version, row['titles']).ratio()
+            if ratio > 0:
+                res.append((row['titles'], ))
         # temp2 = temp1[temp1.version.str.contains('|'.join([' '.join(display_version_split[:i]).lower() for i in range(len(display_version_split))]))]
-        return temp1
+        res = sorted(res, key=lambda x: x[1])
+        return res
         # temp = temp[temp.version.str.contains]
 
 
@@ -94,20 +84,24 @@ class CpeXmlParser:
                 return cpe_item
 
 
-# cpe_xml = CpeXmlParser(cpe_file_name)
-# titles = cpe_xml.get_all_titles_text()
-# cpe_items = cpe_xml.get_all_cpe_items_names()
-# cpe_23_names = cpe_xml.get_all_cpe23_names()
-# cpe_references = cpe_xml.get_all_references_text()
-# finall_df = pd.DataFrame([titles, cpe_items, cpe_23_names, cpe_references]).transpose()
-# finall_df.columns = ['titles', 'cpe_items', 'cpe_23_names', 'cpe_references']
-# splited = finall_df['cpe_23_names'].str.split(':', n=12, expand=True)
-# new_splited_columns = ['cpe', 'cpe_version', 'part', 'vendor', 'product', 'version', 'update', 'edition', 'language',
-#                        'sw_edition', 'target_sw', 'target_hw', 'other']
-# finall_df[new_splited_columns] = splited
-# finall_df = finall_df.drop(['cpe'], axis=1)
-# finall_df.to_csv("parsed_xml.csv")
 
-data_access = CpePdDataAccess(parsed_cpe_csv_file_name, reg_data_file_name)
-res = data_access.find_cpe_by_software("Microsoft Corporation", "3.9.5150.0")
-print(res)
+
+if __name__ == "__main__":
+    cpe_xml = CpeXmlParser(cpe_xml_file_name)
+    titles = cpe_xml.get_all_titles_text()
+    cpe_items = cpe_xml.get_all_cpe_items_names()
+    cpe_23_names = cpe_xml.get_all_cpe23_names()
+    cpe_references = cpe_xml.get_all_references_text()
+    finall_df = pd.DataFrame([titles, cpe_items, cpe_23_names, cpe_references]).transpose()
+    finall_df.columns = ['titles', 'cpe_items', 'cpe_23_names', 'cpe_references']
+    splited = finall_df['cpe_23_names']
+    new_splited_columns = ['cpe', 'cpe_version', 'part', 'vendor', 'product', 'version', 'update', 'edition',
+                           'language',
+                           'sw_edition', 'target_sw', 'target_hw', 'other']
+    finall_df[new_splited_columns] = splited
+    finall_df = finall_df.drop(['cpe'], axis=1)
+    finall_df.to_csv("parsed_xml.csv")
+
+    data_access = CpePdDataAccess(parsed_cpe_csv_file_name, reg_data_file_name)
+    res = data_access.find_cpe_by_software("Python Software Foundation", "3.1.9.0", "Python 3.9.5 pip Bootstrap (64-bit)")
+    print(res)
