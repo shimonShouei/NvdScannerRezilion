@@ -53,6 +53,8 @@ class CpeSwFitter:
             final_res.append([query, relevant_docs["cpe_items"].iloc[0], relevant_docs["titles"].iloc[0], relevant_docs["sim_score"].iloc[0]])
         final_res = pd.DataFrame(final_res)
         final_res.columns = ["registry_sw", "cpe_items", "titles", "sim_score"]
+        final_res.to_csv('retrieved.csv')
+        print(final_res)
         print("end")
 
 
@@ -81,8 +83,8 @@ class SearchEngineBuilder:
 
 
 if __name__ == "__main__":
-    search_builder = SearchEngineBuilder()
-    search_builder.create_models("parsed_xml.csv")
+    # search_builder = SearchEngineBuilder()
+    # search_builder.create_models("parsed_xml.csv")
     cpe_sw_fitter = CpeSwFitter("parsed_xml.csv")
     cpe_sw_fitter.fit_all(1)
 
