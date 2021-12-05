@@ -41,3 +41,6 @@ def getCVE_Dict(year: str) -> {}:
             cve_dict = json.loads(jsonfile.read())
             jsonfile.close()
     return cve_dict
+
+def get_records_by_key(df, key_name, key_value):
+    return df[df[key_name] == key_value]
