@@ -7,3 +7,13 @@ nvd/
 
 /log_file
 
+
+*.log
+
+*.xml
+
+*.zip
+
+*.csv
+
+*.json
