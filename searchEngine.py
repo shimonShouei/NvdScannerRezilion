@@ -8,10 +8,43 @@ from gensim.models import TfidfModel
 from gensim import similarities
 
 
+def add_version(token: str, res_list: []):
+    version_list = token.split(".")
+    res_list.append(token)
+    res_list.append(version_list[0] + ".*")
+
+
+
+def extract_alpha(token: str, res_list: []):
+    new_token = ""
+    for char in token:
+        if char.isalpha():
+            new_token += char
+    if len(new_token) > 0:
+        res_list.append(new_token)
+
+
+def stop_words():
+    return ["corporation"]
+
+
 def parse_doc(doc):
     parsed_doc = doc.split(" ")
-    parsed_doc = [x.lower() for x in parsed_doc]
-    return parsed_doc
+    parsed_doc = [x.lower() for x in parsed_doc if x not in stop_words()]
+    result_tokens = []
+    for token in parsed_doc:
+        if token.isalnum():
+            if token.isascii():
+                result_tokens.append(token)
+        elif "." in token and any(map(str.isdigit, token)):  # The second condition test if the token contains a digit
+            add_version(token,result_tokens)
+        elif any(map(str.isalpha, token)): # Test if the token contains alpha characters and if so, add only the relevant characters
+            extract_alpha(token, result_tokens)
+
+    # print("parsed_doc:  ", parsed_doc)
+    # print("result_tokens:  ", result_tokens)
+    return result_tokens
+
 
 
 def load_pickle(file_path):
@@ -36,7 +69,7 @@ class CpeSwFitter:
         res_sim_sorted_arg = np.sort(bow_query)
         B = np.reshape(np.concatenate([res_sim_sorted, res_sim_sorted_arg]), (2, len(res_sim_sorted))).T
         np_df = pd.DataFrame(B)
-        np_df = np_df[np_df[1] > 0]
+        # np_df = np_df[np_df[1] > 0]
         return np_df.sort_values(by=[1], ascending=False)
 
     def searcher(self, qry, num_to_retrieve):
@@ -72,10 +105,11 @@ class SearchEngineBuilder:
     def create_models(self, parsed_xml_path):
         tokenized_data = self.pre_processing(parsed_xml_path)
         dictionary = corpora.Dictionary(tokenized_data)
+        print(dictionary)
         bow_corpus = [dictionary.doc2bow(text) for text in tokenized_data]
         tfidf = TfidfModel(bow_corpus)
         bow_corpus_tfidf = tfidf[bow_corpus]
-        similarity_matrix = similarities.SparseMatrixSimilarity(bow_corpus_tfidf, num_features=len(dictionary))
+        similarity_matrix = similarities.SoftCosineSimilarity(bow_corpus_tfidf, num_features=len(dictionary))
         pathlib.Path("./models").mkdir(parents=True, exist_ok=True)
         dictionary.save('./models/dictionary.gensim')
         pickle.dump(bow_corpus_tfidf, open('./models/corpus_tfidf.pkl', 'wb'))
@@ -83,8 +117,7 @@ class SearchEngineBuilder:
 
 
 if __name__ == "__main__":
-    # search_builder = SearchEngineBuilder()
-    # search_builder.create_models("parsed_xml.csv")
+    #search_builder = SearchEngineBuilder()
+    #search_builder.create_models("parsed_xml.csv")
     cpe_sw_fitter = CpeSwFitter("parsed_xml.csv")
-    cpe_sw_fitter.fit_all(1)
-
+    cpe_sw_fitter.fit_all(2)
