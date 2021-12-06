@@ -31,7 +31,7 @@ def stop_words():
 
 def parse_doc(doc):
     parsed_doc = doc.split(" ")
-    parsed_doc = [x.lower() for x in parsed_doc if x not in stop_words()]
+    parsed_doc = list(set([x.lower() for x in parsed_doc if x not in stop_words()]))
     result_tokens = []
     for token in parsed_doc:
         if token.isalnum():
@@ -138,7 +138,7 @@ class SearchEngineBuilder:
 if __name__ == "__main__":
     sim_func_names_list = ["cosin"]
     for func in sim_func_names_list:
-        # search_builder = SearchEngineBuilder()
-        # search_builder.create_models("parsed_xml.csv", func)
+        search_builder = SearchEngineBuilder()
+        search_builder.create_models("parsed_xml.csv", func)
         cpe_sw_fitter = CpeSwFitter("parsed_xml.csv", func)
         cpe_sw_fitter.fit_all(1)
