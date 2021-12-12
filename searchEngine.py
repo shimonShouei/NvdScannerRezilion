@@ -6,14 +6,16 @@ from gensim import corpora
 from gensim.models import TfidfModel
 from gensim import similarities
 from tqdm import tqdm
+import re
+import itertools
 
 stop_word = ['corporation']
+
 
 def add_version(token: str, res_list: []):
     version_list = token.split(".")
     res_list.append(token)
     res_list.append(version_list[0] + ".*")
-
 
 
 def extract_alpha(token: str, res_list: []):
@@ -30,22 +32,24 @@ def stop_words():
 
 
 def parse_doc(doc):
-    parsed_doc = doc.split(" ")
-    parsed_doc = list(set([x.lower() for x in parsed_doc if x not in stop_words()]))
+    parsed_doc = re.split(" |_|-", doc)
+    parsed_doc = list(set([x.lower() for x in parsed_doc if x.lower() not in stop_words()]))
     result_tokens = []
     for token in parsed_doc:
+        # if token.__contains__("_"):
+        #     token = token.replace("_", " ")
         if token.isalnum():
             if token.isascii():
                 result_tokens.append(token)
         elif "." in token and any(map(str.isdigit, token)):  # The second condition test if the token contains a digit
-            add_version(token,result_tokens)
-        elif any(map(str.isalpha, token)): # Test if the token contains alpha characters and if so, add only the relevant characters
+            add_version(token, result_tokens)
+        elif any(map(str.isalpha,
+                     token)):  # Test if the token contains alpha characters and if so, add only the relevant characters
             extract_alpha(token, result_tokens)
 
     # print("parsed_doc:  ", parsed_doc)
     # print("result_tokens:  ", result_tokens)
-    return result_tokens
-
+    return list(set(result_tokens))
 
 
 def load_pickle(file_path):
@@ -108,12 +112,17 @@ class CpeSwFitter:
 class SearchEngineBuilder:
     def pre_processing(self, parsed_xml_path):
         parsed_xml = pd.read_csv(parsed_xml_path)
-        parsed_title_df = parsed_xml["titles"].str.split(' ', n=12, expand=True)
-        parsed_df = parsed_title_df
+        parsed_title_df = parsed_xml["titles"]
+
+        # parsed_title_df = parsed_xml["titles"].apply(parse_doc)
+        # parsed_title_df = pd.DataFrame(parsed_title_df.tolist())
+        # # parsed_title_df = parsed_xml["titles"].str.split(' ', n=12, expand=True)
+        parsed_df = parsed_title_df.to_frame()
         parsed_df[["vendor", "product", "version"]] = parsed_xml[["vendor", "product", "version"]]
-        parsed_df = parsed_df.apply(lambda x: x.str.lower())
+        # parsed_df = parsed_df.apply(lambda x: x.str.lower())
+        parsed_df = pd.DataFrame([parsed_df[col].dropna().apply(parse_doc).tolist() for col in parsed_df.columns]).transpose()
         parsed_df["tokens"] = parsed_df.values.tolist()
-        parsed_df["tokens"] = parsed_df["tokens"].apply(lambda x: [y for y in x if y is not None and y is not np.nan])
+        parsed_df["tokens"] = parsed_df["tokens"].apply(lambda x: [y for y in x if y is not None and y is not np.nan]).apply(lambda x:  list(itertools.chain(*x)))
         return parsed_df["tokens"]
 
     def create_models(self, parsed_xml_path, sim_func_name):
