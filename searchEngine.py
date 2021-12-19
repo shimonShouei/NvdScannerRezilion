@@ -118,24 +118,17 @@ class SearchEngineBuilder:
 
     def pre_processing(self, parsed_xml_path):
         parsed_xml = pd.read_csv(parsed_xml_path)
-        # parsed_title_df = parsed_xml["titles"].str.split(' ', n=12, expand=True)
-        # parsed_title_df = parsed_title_df.apply(pd.Series)
-        # parsed_title_df = parsed_title_df.str.split(' ', n=12, expand=True)
-
-        #parse2 = parsed_title_df.str.split(',')
-        #parse2 = parse2.apply(lambda x: [x.split(',')])
-        # parsed_title_df = parsed_xml["titles"]
-        parsed_title_df = parsed_xml["titles"]
-
+        parsed_title_df = parsed_xml["titles"].str.split(' ', n=12, expand=True)
         # parsed_title_df = parsed_xml["titles"].apply(parse_doc)
-        # parsed_title_df = pd.DataFrame(parsed_title_df.tolist())
-        # # parsed_title_df = parsed_xml["titles"].str.split(' ', n=12, expand=True)
-        parsed_df = parsed_title_df.to_frame()
+        parsed_df = parsed_title_df
         parsed_df[["vendor", "product", "version"]] = parsed_xml[["vendor", "product", "version"]]
         # parsed_df = parsed_df.apply(lambda x: x.str.lower())
-        parsed_df = pd.DataFrame([parsed_df[col].dropna().apply(parse_doc).tolist() for col in parsed_df.columns]).transpose()
+        parsed_df = pd.DataFrame(
+            [parsed_df[col].dropna().apply(parse_doc).tolist() for col in parsed_df.columns]).transpose()
         parsed_df["tokens"] = parsed_df.values.tolist()
-        parsed_df["tokens"] = parsed_df["tokens"].apply(lambda x: [y for y in x if y is not None and y is not np.nan]).apply(lambda x:  list(itertools.chain(*x)))
+        new_list = parsed_df.values.tolist()
+        parsed_df["tokens"] = parsed_df["tokens"].apply(lambda x: [y for y in x if y is not None and y is not np.nan])
+        new_list2 = parsed_df["tokens"].tolist()
         return parsed_df["tokens"]
 
     def create_models(self, parsed_xml_path, sim_func_name):
