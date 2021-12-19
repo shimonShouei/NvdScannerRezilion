@@ -14,7 +14,7 @@ stop_word = ['corporation']
 
 def add_version(token: str, res_list: []):
     version_list = token.split(".")
-    res_list.append(token)
+    # res_list.append(token)
     res_list.append(version_list[0] + ".*")
 
 
@@ -28,10 +28,12 @@ def extract_alpha(token: str, res_list: []):
 
 
 def stop_words():
-    return ["corporation"]
+    return ['corporation', 'software', 'foundation','for']
 
 
 def parse_doc(doc):
+    parsed_doc = doc.split(" ")
+    parsed_doc = list(set([x.lower() for x in parsed_doc if x.lower() not in stop_words()]))
     parsed_doc = re.split(" |_|-", doc)
     parsed_doc = list(set([x.lower() for x in parsed_doc if x.lower() not in stop_words()]))
     result_tokens = []
@@ -41,10 +43,14 @@ def parse_doc(doc):
         if token.isalnum():
             if token.isascii():
                 result_tokens.append(token)
+        # The second condition test if the token contains a digit
+        elif "." in token and any(map(str.isdigit, token)):
+            add_version(token, result_tokens)
+        # Test if the token contains alpha characters and if so, add only the relevant characters
+        # elif any(map(str.isalpha, token)):
         elif "." in token and any(map(str.isdigit, token)):  # The second condition test if the token contains a digit
             add_version(token, result_tokens)
-        elif any(map(str.isalpha,
-                     token)):  # Test if the token contains alpha characters and if so, add only the relevant characters
+        elif any(map(str.isalpha, token)):  # Test if the token contains alpha characters and if so, add only the relevant characters
             extract_alpha(token, result_tokens)
 
     # print("parsed_doc:  ", parsed_doc)
@@ -66,10 +72,9 @@ class CpeSwFitter:
         self.bow_corpus_tfidf = load_pickle('./models/corpus_tfidf.pkl')
         self.similarity_matrix = similarities.SparseMatrixSimilarity.load('./models/similarity_matrix.gensim')
         self.sim_func_name = sim_func_name
-        # if sim_func_name == 'cosin':
-        #     self.similarity_func = similarities.SoftCosineSimilarity.load('./models/similarity_func_{}.gensim'.format(sim_func_name))
-        # elif sim_func_name == 'default':
-        #     self.similarity_matrix = similarities.SparseMatrixSimilarity.load('./models/similarity_matrix.gensim')
+        # if sim_func_name == 'cosin': self.similarity_func = similarities.SoftCosineSimilarity.load(
+        # './models/similarity_func_{}.gensim'.format(sim_func_name)) elif sim_func_name == 'default':
+        # self.similarity_matrix = similarities.SparseMatrixSimilarity.load('./models/similarity_matrix.gensim')
         self.parsed_xml = pd.read_csv(parsed_xml_path)
 
     def calc_similarity(self, qry):
@@ -110,8 +115,16 @@ class CpeSwFitter:
 
 
 class SearchEngineBuilder:
+
     def pre_processing(self, parsed_xml_path):
         parsed_xml = pd.read_csv(parsed_xml_path)
+        # parsed_title_df = parsed_xml["titles"].str.split(' ', n=12, expand=True)
+        # parsed_title_df = parsed_title_df.apply(pd.Series)
+        # parsed_title_df = parsed_title_df.str.split(' ', n=12, expand=True)
+
+        #parse2 = parsed_title_df.str.split(',')
+        #parse2 = parse2.apply(lambda x: [x.split(',')])
+        # parsed_title_df = parsed_xml["titles"]
         parsed_title_df = parsed_xml["titles"]
 
         # parsed_title_df = parsed_xml["titles"].apply(parse_doc)

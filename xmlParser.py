@@ -82,6 +82,6 @@ class CpeXmlParser:
 
 
 
-# if __name__ == '__main__':
-    # a = CpeXmlParser('official-cpe-dictionary_v2.3.xml')
-    # a.csv_creator('official-cpe-dictionary_v2.3.xml')
+if __name__ == '__main__':
+    a = CpeXmlParser('official-cpe-dictionary_v2.3.xml')
+    a.csv_creator('official-cpe-dictionary_v2.3.xml')
