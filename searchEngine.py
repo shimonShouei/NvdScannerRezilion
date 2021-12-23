@@ -25,7 +25,7 @@ def extract_alpha(token: str, res_list: []):
 
 
 def stop_words():
-    return ["corporation"]
+    return ['corporation', 'software', 'foundation','for']
 
 
 def parse_version_for_registery(token):
@@ -83,10 +83,9 @@ class CpeSwFitter:
         self.bow_corpus_tfidf = load_pickle('./models/corpus_tfidf.pkl')
         self.similarity_matrix = similarities.SparseMatrixSimilarity.load('./models/similarity_matrix.gensim')
         self.sim_func_name = sim_func_name
-        # if sim_func_name == 'cosin':
-        #     self.similarity_func = similarities.SoftCosineSimilarity.load('./models/similarity_func_{}.gensim'.format(sim_func_name))
-        # elif sim_func_name == 'default':
-        #     self.similarity_matrix = similarities.SparseMatrixSimilarity.load('./models/similarity_matrix.gensim')
+        # if sim_func_name == 'cosin': self.similarity_func = similarities.SoftCosineSimilarity.load(
+        # './models/similarity_func_{}.gensim'.format(sim_func_name)) elif sim_func_name == 'default':
+        # self.similarity_matrix = similarities.SparseMatrixSimilarity.load('./models/similarity_matrix.gensim')
         self.parsed_xml = pd.read_csv(parsed_xml_path)
 
     def calc_similarity(self, qry):

@@ -22,7 +22,10 @@ class RegistryConnection:
             logging.info("***cursor is empty ***")
 
     def get_software_data_by_field(self, software_key, requested_data_field):
-        return QueryValueEx(software_key, requested_data_field)
+        try:
+            return QueryValueEx(software_key, requested_data_field)
+        except FileNotFoundError:
+            return ['']
 
     def get_software_enum_key(self, directory_conn, software_index):
         return EnumKey(directory_conn, software_index)
@@ -65,18 +68,35 @@ class InstalledSoftware:
         for k, elm in enumerate(lst):
             logging.info("{}: {}".format(k + 1, elm[0]))
 
+    def remove_empty_list_items(self, lst):
+        len_cols = len(lst[0])  # cleaning the list from empty items
+        len_rows = len(lst)
+        col = -1
+        while col < len_cols - 1:
+            col += 1
+            for row in range(0, len_rows):
+                if lst[row][col] == '':
+                    delete = True
+                else:
+                    break
+                if row == (len_rows - 1) and delete:
+                    for newRow in range(0, len_rows):
+                        del lst[newRow][col]
+                    len_cols = len_cols - 1
+                    col -= 1
+
     def dump_software_lst_to_json(self, requested_fields_lst):
         final_lst = []
         for field in requested_fields_lst:
             self.requested_data_field = field
             final_lst.append(self.get_installed_software())
+        self.remove_empty_list_items(final_lst)
+
         df = pd.DataFrame(data=final_lst)
         df = df.rename(index={df.index[i]: requested_fields_lst[i] for i in range(len(requested_fields_lst))})
-        # df.columns =requested_fields_lst
         df.to_json("registry_data.json")
 
 
 if __name__ == "__main__":
     i_s = InstalledSoftware()
-    # i_s.get_installed_software()
     i_s.dump_software_lst_to_json(["Publisher", 'DisplayVersion', 'DisplayName'])
