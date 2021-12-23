@@ -1,4 +1,7 @@
 import pickle
+from collections import deque
+
+import numpy
 import pandas as pd
 import numpy as np
 import pathlib
@@ -10,12 +13,6 @@ import re
 import itertools
 
 stop_word = ['corporation']
-
-
-def add_version(token: str, res_list: []):
-    version_list = token.split(".")
-    res_list.append(token)
-    res_list.append(version_list[0] + ".*")
 
 
 def extract_alpha(token: str, res_list: []):
@@ -31,8 +28,26 @@ def stop_words():
     return ["corporation"]
 
 
-def parse_doc(doc):
-    parsed_doc = re.split(" |_|-", doc)
+def parse_version_for_registery(token):
+    new_res = ""
+    for char in token:
+        if char.isnumeric():
+            new_res += char
+        if char == ".":
+            new_res += char
+    return new_res
+
+
+def parse_barkets(token):
+    new_res = ""
+    for c in token:
+        if c != "(" or c != ")":
+            new_res += c
+    return new_res
+
+
+def parse_doc(doc: str):
+    parsed_doc = str(doc).split()
     parsed_doc = list(set([x.lower() for x in parsed_doc if x.lower() not in stop_words()]))
     result_tokens = []
     for token in parsed_doc:
@@ -41,11 +56,13 @@ def parse_doc(doc):
         if token.isalnum():
             if token.isascii():
                 result_tokens.append(token)
-        elif "." in token and any(map(str.isdigit, token)):  # The second condition test if the token contains a digit
-            add_version(token, result_tokens)
         elif any(map(str.isalpha,
                      token)):  # Test if the token contains alpha characters and if so, add only the relevant characters
             extract_alpha(token, result_tokens)
+        elif "." in token:
+            result_tokens.append(parse_version_for_registery(token))
+        elif "(" in token:
+            result_tokens.append(parse_barkets(token))
 
     # print("parsed_doc:  ", parsed_doc)
     # print("result_tokens:  ", result_tokens)
@@ -110,19 +127,46 @@ class CpeSwFitter:
 
 
 class SearchEngineBuilder:
+
+    @staticmethod
+    def parse_title(param):
+        if param is not None:
+            new_string = ""
+            for s in param:
+                if s.isalpha():
+                    new_string += s
+            return new_string
+
+    @staticmethod
+    def parse_version(str: str):
+        new_string = re.sub(r'[a-zA-Z]', '', str)
+        new_string = new_string.replace("\\", "")
+        return new_string
+
     def pre_processing(self, parsed_xml_path):
         parsed_xml = pd.read_csv(parsed_xml_path)
         parsed_title_df = parsed_xml["titles"].str.split(' ', n=12, expand=True)
-        #parsed_title_df = parsed_xml["titles"].apply(parse_doc)
+
+        # parsed_title_df = parsed_title_df.apply(lambda x: [y for y in x if y is not None and y is not np.nan])
+        for column in parsed_title_df:
+            parsed_title_df[column] = parsed_title_df[column].apply(lambda x: self.parse_title(str(x)))
+
+        # for rowIndex, row in parsed_title_df.iterrows():  # iterate over rows
+        #     for columnIndex, value in row.items():
+        #         if row[columnIndex] is not None and row[columnIndex] is not np.nan:
+        #             row[columnIndex] = parse_title(row[columnIndex])
         parsed_df = parsed_title_df
         parsed_df[["vendor", "product", "version"]] = parsed_xml[["vendor", "product", "version"]]
-        # parsed_df = parsed_df.apply(lambda x: x.str.lower())
-        parsed_df = pd.DataFrame([parsed_df[col].dropna().apply(parse_doc).tolist() for col in parsed_df.columns]).transpose()
+        parsed_df = parsed_df.apply(lambda x: x.str.lower())
+        parsed_df["version"] = parsed_df["version"].apply(lambda x: self.parse_version(str(x)))
         parsed_df["tokens"] = parsed_df.values.tolist()
-        new_list = parsed_df.values.tolist()
         parsed_df["tokens"] = parsed_df["tokens"].apply(lambda x: [y for y in x if y is not None and y is not np.nan])
-        new_list2 = parsed_df["tokens"].tolist()
+        parsed_df.to_csv('parse_df{}.csv')
         return parsed_df["tokens"]
+
+    def get_tokens(self, list_to_add: [], res_list: []):
+        for token in list_to_add:
+            res_list.extend(token)
 
     def create_models(self, parsed_xml_path, sim_func_name):
         tokenized_data = self.pre_processing(parsed_xml_path)
