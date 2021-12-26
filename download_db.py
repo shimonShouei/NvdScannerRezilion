@@ -1,3 +1,5 @@
+import os
+
 import requests
 import re
 from os import listdir
@@ -37,3 +39,15 @@ class DownloadDb:
             with open("nvd/" + filename, 'wb') as f:
                 for chunk in r_file:
                     f.write(chunk)
+
+
+    def download_file(source_url, file_name):
+        r_file = requests.get(source_url, stream=True)
+        with open(file_name, 'wb') as f:
+            for chunk in r_file:
+                f.write(chunk)
+
+    def unzip_file(file_name, directory_to_extract=None):
+        with zipfile.ZipFile(file_name, 'r') as zip_ref:
+            zip_ref.extractall(directory_to_extract)
+        os.remove(file_name)  # removing the .zip file
