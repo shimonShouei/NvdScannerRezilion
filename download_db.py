@@ -51,3 +51,9 @@ class DownloadDb:
         with zipfile.ZipFile(file_name, 'r') as zip_ref:
             zip_ref.extractall(directory_to_extract)
         os.remove(file_name)  # removing the .zip file
+
+
+
+if __name__ == '__main__':
+    DownloadDb.download_file('https://nvd.nist.gov/products/cpe', 'official-cpe-dictionary_v2.3.xml.zip')
+    DownloadDb.unzip_file('official-cpe-dictionary_v2.3.xml.zip', directory_to_extract=None)
