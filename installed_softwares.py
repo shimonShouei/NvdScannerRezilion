@@ -1,3 +1,4 @@
+import os
 import winreg
 from winreg import QueryValueEx, EnumKey
 import logging
@@ -96,7 +97,3 @@ class InstalledSoftware:
         df = df.rename(index={df.index[i]: requested_fields_lst[i] for i in range(len(requested_fields_lst))})
         df.to_json("registry_data.json")
 
-
-if __name__ == "__main__":
-    i_s = InstalledSoftware()
-    i_s.dump_software_lst_to_json(["Publisher", 'DisplayVersion', 'DisplayName'])

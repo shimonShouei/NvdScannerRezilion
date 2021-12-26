@@ -42,19 +42,18 @@ class DownloadDb:
                     f.write(chunk)
 
 
-    def download_file(source_url, file_name):
-        r_file = requests.get(source_url, stream=True)
-        with open(file_name, 'wb') as f:
-            for chunk in r_file:
-                f.write(chunk)
-
-    def unzip_file(file_name, directory_to_extract=None):
-        with zipfile.ZipFile(file_name, 'r') as zip_ref:
-            zip_ref.extractall(directory_to_extract)
-        os.remove(file_name)  # removing the .zip file
+def download_file():
+    url = 'https://nvd.nist.gov/feeds/xml/cpe/dictionary/official-cpe-dictionary_v2.3.xml.zip'
+    wget.download(url)
+    # r_file = requests.get(source_url, stream=True)
+    # with open(file_name, 'wb') as f:
+    #     for chunk in r_file:
+    #         f.write(chunk)
 
 
+def unzip_file(file_name, directory_to_extract=None):
+    with zipfile.ZipFile(file_name, 'r') as zip_ref:
+        zip_ref.extractall(directory_to_extract)
+    os.remove(file_name)  # removing the .zip file
 
-if __name__ == '__main__':
-    DownloadDb.download_file('https://nvd.nist.gov/products/cpe', 'official-cpe-dictionary_v2.3.xml.zip')
-    DownloadDb.unzip_file('official-cpe-dictionary_v2.3.xml.zip', directory_to_extract=None)
+

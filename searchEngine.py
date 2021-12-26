@@ -160,7 +160,7 @@ class SearchEngineBuilder:
         parsed_df["version"] = parsed_df["version"].apply(lambda x: self.parse_version(str(x)))
         parsed_df["tokens"] = parsed_df.values.tolist()
         parsed_df["tokens"] = parsed_df["tokens"].apply(lambda x: [y for y in x if y is not None and y is not np.nan])
-        parsed_df.to_csv('parse_df{}.csv')
+        # parsed_df.to_csv('parse_df{}.csv')
         return parsed_df["tokens"]
 
     def get_tokens(self, list_to_add: [], res_list: []):
@@ -185,11 +185,3 @@ class SearchEngineBuilder:
         pickle.dump(bow_corpus_tfidf, open('./models/corpus_tfidf.pkl', 'wb'))
         similarity_matrix.save('./models/similarity_matrix.gensim')
 
-
-if __name__ == "__main__":
-    sim_func_names_list = ["cosin"]
-    for func in sim_func_names_list:
-        search_builder = SearchEngineBuilder()
-        search_builder.create_models("parsed_xml.csv", func)
-        cpe_sw_fitter = CpeSwFitter("parsed_xml.csv", func)
-        cpe_sw_fitter.fit_all(1)
