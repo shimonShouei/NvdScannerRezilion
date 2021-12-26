@@ -12,8 +12,6 @@ from tqdm import tqdm
 import re
 import itertools
 
-stop_word = ['corporation']
-
 
 def extract_alpha(token: str, res_list: []):
     new_token = ""
@@ -114,11 +112,12 @@ class CpeSwFitter:
         for col in tqdm(self.registry_data):
             query = self.registry_data[col].str.cat(sep=' ', na_rep='')
             relevant_docs = self.searcher(query, num_to_retrieve)
-            if relevant_docs.empty:
-                final_res.append([query, None, None, 0])
-            else:
-                final_res.append([query, relevant_docs["cpe_items"].iloc[0], relevant_docs["titles"].iloc[0],
-                                  relevant_docs["sim_score"].iloc[0]])
+            for i in range(len(relevant_docs)):
+                if relevant_docs.empty:
+                    final_res.append([query, None, None, 0])
+                else:
+                    final_res.append([query, relevant_docs["cpe_items"].iloc[i], relevant_docs["titles"].iloc[i],
+                                    relevant_docs["sim_score"].iloc[i]])
         final_res = pd.DataFrame(final_res)
         final_res.columns = ["registry_sw", "cpe_items", "titles", "sim_score"]
         final_res.to_csv('retrieved_{}.csv'.format(self.sim_func_name))
