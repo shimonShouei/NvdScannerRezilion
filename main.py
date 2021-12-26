@@ -1,5 +1,8 @@
 import get_files_programfiles
 from cve_parser import CveParser
+from installed_softwares import InstalledSoftware
+from searchEngine import SearchEngineBuilder, CpeSwFitter
+from xmlParser import CpeXmlParser
 
 
 def main():
@@ -12,10 +15,6 @@ def main():
 
     get_files_programfiles.get_file_from_path("TeamViewer")
     # get_files_programfiles.get_file_from_path("C:\Program Files (x86)")
-
-
-
-
 
 
 if __name__ == '__main__':

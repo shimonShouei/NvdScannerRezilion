@@ -80,8 +80,8 @@ class CpeXmlParser:
         # Making a CSV file in the folder
         df.to_csv("parsed_xml.csv")
 
-
-
 if __name__ == '__main__':
+    i_s = InstalledSoftware()
+    i_s.dump_software_lst_to_json(["Publisher", 'DisplayVersion', 'DisplayName'])
     a = CpeXmlParser('official-cpe-dictionary_v2.3.xml')
     a.csv_creator('official-cpe-dictionary_v2.3.xml')

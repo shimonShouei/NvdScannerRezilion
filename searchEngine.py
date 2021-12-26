@@ -186,7 +186,8 @@ class SearchEngineBuilder:
         similarity_matrix.save('./models/similarity_matrix.gensim')
 
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     sim_func_names_list = ["cosin"]
     for func in sim_func_names_list:
         search_builder = SearchEngineBuilder()
