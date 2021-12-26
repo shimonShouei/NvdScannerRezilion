@@ -25,7 +25,7 @@ def extract_alpha(token: str, res_list: []):
 
 
 def stop_words():
-    return ['corporation', 'software', 'foundation','for']
+    return ["corporation"]
 
 
 def parse_version_for_registery(token):
@@ -51,13 +51,12 @@ def parse_doc(doc: str):
     parsed_doc = list(set([x.lower() for x in parsed_doc if x.lower() not in stop_words()]))
     result_tokens = []
     for token in parsed_doc:
-        # if token.__contains__("_"):
+        # if token._contains(""):
         #     token = token.replace("_", " ")
         if token.isalnum():
             if token.isascii():
                 result_tokens.append(token)
-        elif any(map(str.isalpha,
-                     token)):  # Test if the token contains alpha characters and if so, add only the relevant characters
+        elif any(map(str.isalpha,token)):  # Test if the token contains alpha characters and if so, add only the relevant characters
             extract_alpha(token, result_tokens)
         elif "." in token:
             result_tokens.append(parse_version_for_registery(token))
@@ -77,20 +76,21 @@ def load_pickle(file_path):
 
 
 class CpeSwFitter:
-    def __init__(self, parsed_xml_path, sim_func_name):
+    def _init_(self, parsed_xml_path, sim_func_name):
         self.registry_data = pd.read_json("registry_data.json")
         self.dictionary = load_pickle('./models/dictionary.gensim')
         self.bow_corpus_tfidf = load_pickle('./models/corpus_tfidf.pkl')
         self.similarity_matrix = similarities.SparseMatrixSimilarity.load('./models/similarity_matrix.gensim')
         self.sim_func_name = sim_func_name
-        # if sim_func_name == 'cosin': self.similarity_func = similarities.SoftCosineSimilarity.load(
-        # './models/similarity_func_{}.gensim'.format(sim_func_name)) elif sim_func_name == 'default':
-        # self.similarity_matrix = similarities.SparseMatrixSimilarity.load('./models/similarity_matrix.gensim')
+        # if sim_func_name == 'cosin':
+        #     self.similarity_func = similarities.SoftCosineSimilarity.load('./models/similarity_func_{}.gensim'.format(sim_func_name))
+        # elif sim_func_name == 'default':
+        #     self.similarity_matrix = similarities.SparseMatrixSimilarity.load('./models/similarity_matrix.gensim')
         self.parsed_xml = pd.read_csv(parsed_xml_path)
 
     def calc_similarity(self, qry):
         parsed_query = parse_doc(qry)
-        if qry.__contains__("One"):
+        if qry._contains_("One"):
             print('d')
         bow_query = self.similarity_matrix[self.dictionary.doc2bow(parsed_query)]
         res_sim_sorted = np.argsort(bow_query)
@@ -101,7 +101,7 @@ class CpeSwFitter:
         return np_df.sort_values(by=[1], ascending=False)
 
     def searcher(self, qry, num_to_retrieve):
-        if qry.__contains__("One"):
+        if qry._contains_("One"):
             print('d')
         indices_and_score = self.calc_similarity(qry).head(num_to_retrieve)
         relevant_docs = self.parsed_xml.iloc[indices_and_score[0]][["cpe_items", "titles"]].reset_index(drop=True)
