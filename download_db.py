@@ -7,6 +7,7 @@ from os.path import isfile, join
 import zipfile
 import json
 import pathlib
+import wget
 
 
 class DownloadDb:
