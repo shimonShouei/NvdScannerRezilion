@@ -21,11 +21,11 @@ if __name__ == '__main__':
         a = CpeXmlParser('official-cpe-dictionary_v2.3.xml')
         a.csv_creator('official-cpe-dictionary_v2.3.xml')
 
-    if not os.path.isfile("retrieved_cosin.csv"):
-        sim_func_names_list = ["cosin"]
-        for func in sim_func_names_list:
-            search_builder = SearchEngineBuilder()
-            search_builder.create_models("parsed_xml.csv", func)
-            cpe_sw_fitter = CpeSwFitter("parsed_xml.csv", func)
-            cpe_sw_fitter.fit_all(1)
+    # if not os.path.isfile("retrieved_cosin.csv"):
+    sim_func_names_list = ["cosin"]
+    for func in sim_func_names_list:
+        search_builder = SearchEngineBuilder()
+        search_builder.create_models("parsed_xml.csv", func)
+        cpe_sw_fitter = CpeSwFitter("parsed_xml.csv", func)
+        cpe_sw_fitter.fit_all(5)
     print("end")

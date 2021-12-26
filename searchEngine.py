@@ -102,6 +102,7 @@ class CpeSwFitter:
 
     def searcher(self, qry, num_to_retrieve):
         if qry.__contains__("One"):
+
             print('d')
         indices_and_score = self.calc_similarity(qry).head(num_to_retrieve)
         relevant_docs = self.parsed_xml.iloc[indices_and_score[0]][["cpe_items", "titles"]].reset_index(drop=True)
