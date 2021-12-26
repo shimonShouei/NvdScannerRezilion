@@ -7,3 +7,19 @@ nvd/
 
 /log_file
 
+/official-cpe-dictionary_v2.3.xml
+/official-cpe-dictionary_v2.3.csv
+/official-cpe-dictionary_v2.3.zip
+/log_file.log
+
+*.log
+
+*.xml
+
+*.zip
+
+*.csv
+
+*.json
+
+models/
