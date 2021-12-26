@@ -3,6 +3,7 @@ from cve_parser import CveParser
 from installed_softwares import InstalledSoftware
 from searchEngine import SearchEngineBuilder, CpeSwFitter
 from xmlParser import CpeXmlParser
+import download_db
 
 
 def main():
@@ -15,7 +16,6 @@ def main():
 
     get_files_programfiles.get_file_from_path("TeamViewer")
     # get_files_programfiles.get_file_from_path("C:\Program Files (x86)")
-
 
 if __name__ == '__main__':
     main()
