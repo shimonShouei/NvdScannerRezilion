@@ -3,13 +3,13 @@
 
 __pycache__/
 
-nvd/
+resources/cve/
 
 /log_file
 
-/official-cpe-dictionary_v2.3.xml
+/resources/official-cpe-dictionary_v2.3.xml
 /official-cpe-dictionary_v2.3.csv
-/official-cpe-dictionary_v2.3.zip
+/resources/official-cpe-dictionary_v2.3.zip
 /log_file.log
 
 *.log

@@ -78,4 +78,4 @@ class CpeXmlParser:
         df = df.drop(['cpe'], axis=1)
 
         # Making a CSV file in the folder
-        df.to_csv("parsed_xml.csv")
+        df.to_csv("./resources/parsed_xml.csv")

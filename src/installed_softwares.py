@@ -32,13 +32,16 @@ class RegistryConnection:
         return EnumKey(directory_conn, software_index)
 
 
+
 class InstalledSoftware:
     def __init__(self):
+        self.logger = None
         self.reg_conn = RegistryConnection()
         self.requested_data_field = "DisplayName"  # choose here which field you need
         self.log_configures()
 
     def get_installed_software(self):
+        logger = logging.getLogger('NvdScannerRezilion')
         software_lst = []
         for hkey in self.reg_conn.hkey_dict:
             self.reg_conn.connect_to_main_key(hkey)  # establish connection to registry
@@ -54,20 +57,21 @@ class InstalledSoftware:
                 except FileNotFoundError:
                     continue
                 except EnvironmentError:
-                    logging.info(r"*** %s files was found in %s ***" % (i, self.reg_conn.hkey_dict[hkey]))
+                    logger.info(r"*** %s files was found in %s ***" % (i, self.reg_conn.hkey_dict[hkey]))
                     break
         return software_lst
 
     def log_configures(self):
-        log_name = 'log_file.log'
+        log_name = './logs/installed_softwares.log'
+        self.logger = logging.getLogger('softwares')
         logging.basicConfig(filename=log_name,
-                            filemode='a',
-                            format='%(asctime)s %(message)s',
-                            level=logging.INFO)
+                                filemode='a',
+                                format='%(asctime)s %(message)s',
+                                level=logging.INFO)
 
     def log_lists(self, lst):
         for k, elm in enumerate(lst):
-            logging.info("{}: {}".format(k + 1, elm[0]))
+            self.logger.info("{}: {}".format(k + 1, elm[0]))
 
     def remove_empty_list_items(self, lst):
         len_cols = len(lst[0])  # cleaning the list from empty items
@@ -95,5 +99,5 @@ class InstalledSoftware:
 
         df = pd.DataFrame(data=final_lst)
         df = df.rename(index={df.index[i]: requested_fields_lst[i] for i in range(len(requested_fields_lst))})
-        df.to_json("registry_data.json")
+        df.to_json("./resources/registry_data.json")
 
