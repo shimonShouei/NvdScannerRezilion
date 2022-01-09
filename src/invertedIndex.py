@@ -55,12 +55,9 @@ class InvertedIndex:
     #         if re.compile('(.*zip$)').match(file):
     #             dd.unzip_file("{}\{}".format(root, file), root)
 
-    def extract_data_all_dir(self, cve_dict_by_Name):
-        if not os.path.exists("./models/inverted_index.pkl"):
-            for cve_dict in tqdm(cve_dict_by_Name.values()):
-                self.extract_data_one_file(cve_dict)
-            save_pickle(self.inverted_index, "./models/inverted_index")
-            logger.info("Inverted index created")
-        else:
-            self.inverted_index = load_pickle("./models/inverted_index")
-            logger.info("Inverted index loaded")
+    def extract_data_all_dir(self, cve_dict_by_Name=None):
+        for cve_dict in tqdm(cve_dict_by_Name.values()):
+            self.extract_data_one_file(cve_dict)
+        save_pickle(self.inverted_index, "./models/inverted_index")
+        logger.info("Inverted index created")
+

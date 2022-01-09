@@ -15,7 +15,6 @@ import re
 import itertools
 
 
-
 def extract_alpha(token: str, res_list: []):
     new_token = ""
     for char in token:
