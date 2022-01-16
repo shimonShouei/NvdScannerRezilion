@@ -34,11 +34,13 @@ class App:
 
     def scan(self, cpe_s, inverted_ind):
         self.logger.info("scanning...")
+        self.logger.info("scanning...")
         cve_dict = {}
         for cpe in cpe_s.values.tolist():
             if cpe in inverted_ind.inverted_index:
                 cve_dict[cpe] = inverted_ind.inverted_index[cpe]
         json.dump(cve_dict, open("./resources/My_cves.json", 'w'))
+        self.logger.info("For your results look for My_cves.json at /resources")
         self.logger.info("For your results look for My_cves.json at /resources")
         return cve_dict
 
@@ -48,9 +50,12 @@ class App:
             """
         if self.update_cpe or not os.path.exists('./resources/official-cpe-dictionary_v2.3.xml'):
             self.logger.info("Download CPE dictionary")
+            self.logger.info("Download CPE dictionary")
             download_db.download_cpe_dict()
             self.logger.info("CPE dict downloaded")
+            self.logger.info("CPE dict downloaded")
             download_db.unzip_file('./resources/official-cpe-dictionary_v2.3.xml.zip', './resources/')
+            self.logger.info("CPE dict unzipped")
             self.logger.info("CPE dict unzipped")
 
     def parse_cpe_xml(self):
@@ -59,9 +64,11 @@ class App:
             """
         if self.update_cpe or not os.path.exists("./resources/parsed_xml.csv"):
             self.logger.info("Parse CPE dict xml to a csv")
+            print("Parse CPE dict xml to a csv")
             parser = CpeXmlParser('./resources/official-cpe-dictionary_v2.3.xml')
             parser.csv_creator('./resources/official-cpe-dictionary_v2.3.xml')
             self.logger.info("CPE dict xml parsed")
+            print("CPE dict xml parsed")
 
     def get_local_sw(self):
         """
@@ -69,9 +76,11 @@ class App:
             """
         if self.update_local_sw or not os.path.exists("./resources/registry_data.json"):
             self.logger.info("Get local software's from Registry")
+            print("Get local software's from Registry")
             i_s = InstalledSoftware()
             i_s.dump_software_lst_to_json(["Publisher", 'DisplayVersion', 'DisplayName'])
             self.logger.info("Local softwares info Extracted")
+            print("Local softwares info Extracted")
 
     def build_searcher(self):
         """
@@ -82,16 +91,21 @@ class App:
                    or not os.path.exists('./models/similarity_matrix.gensim')
         if tmp_bool or self.update_cpe:
             self.logger.info("Build searcher for scanning")
+            print("Build searcher for scanning")
             search_builder = SearchEngineBuilder()
             search_builder.create_models("./resources/parsed_xml.csv")
             self.logger.info("Models created. (gensim dict, tfidf corpus and similarity matrix)")
+            print("Models created. (gensim dict, tfidf corpus and similarity matrix)")
 
     def find_my_cpe(self):
         self.logger.info("Fit my software's to cpe's")
+        print("Fit my software's to cpe's")
         cpe_sw_fitter = CpeSwFitter("./resources/parsed_xml.csv", self.update_my_cpe)
         self.logger.info("Models loaded.")
+        print("Models loaded.")
         my_cpe_ = cpe_sw_fitter.fit_all(1, self.threshold)
         self.logger.info(f"CPEs fitted to local softwares list by searcher. threshold: {self.threshold}")
+        print(f"CPEs fitted to local softwares list by searcher. threshold: {self.threshold}")
         return my_cpe_
 
     def download_cve_dicts(self):
@@ -114,6 +128,7 @@ class App:
         else:
             invInd_.inverted_index = load_pickle("./models/inverted_index")
             self.logger.info("Inverted index loaded")
+            print("Inverted index loaded")
         return invInd_
 
 

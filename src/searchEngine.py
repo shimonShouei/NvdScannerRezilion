@@ -123,9 +123,11 @@ class CpeSwFitter:
             final_res.to_csv('./resources/My_cpes.csv')
             # print(final_res)
             logger.info("My cpe's created")
+            print("My cpe's created")
         else:
             final_res = pd.read_csv('./resources/My_cpes.csv')
             logger.info("My cpe's loaded")
+            print("My cpe's loaded")
         return final_res.loc[final_res["sim_score"] >= thresh]["cpe_23_names"]
 
 

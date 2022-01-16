@@ -19,10 +19,13 @@ class DownloadDb:
     def __init__(self):
         if 'cve' not in listdir("resources"):
             logger.info("Download CVE dicts")
+            print("Download CVE dicts")
             pathlib.Path('./resources/cve').mkdir(parents=True, exist_ok=True)
             self.download_all_zips_files()
             logger.info("All CVEs data downloaded from NVD website.")
+            print("All CVEs data downloaded from NVD website.")
         logger.info("Load CVE dicts")
+        print("Load CVE dicts")
         files = [f for f in listdir("./resources/cve/") if isfile(join("./resources/cve/", f))]
         files.sort()
         for file_name in tqdm(files):
@@ -32,7 +35,9 @@ class DownloadDb:
             self.cve_dict[year] = json.loads(jsonfile.read())
             jsonfile.close()
             logger.info(f"{year} CVEs file loaded.")
+            print(f"{year} CVEs file loaded.")
         logger.info("All CVEs data loaded.")
+        print("All CVEs data loaded.")
 
 
     @staticmethod
@@ -47,6 +52,7 @@ class DownloadDb:
             r_file = requests.get("https://nvd.nist.gov/feeds/json/cve/1.1/" + filename, stream=True)
             with open("./resources/cve/" + filename, 'wb') as f:
                 logger.info(f"Download {filename}")
+                print(f"Download {filename}")
                 for chunk in r_file:
                     f.write(chunk)
 
